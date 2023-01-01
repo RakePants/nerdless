@@ -14,7 +14,7 @@ def get_toxicity(input):
     return round(tox_score, 3)
 
 
-with open('dialogues/raw/chan_dialogues_test.txt', encoding="utf8") as f:
+with open('dialogues/raw/chan_dialogues.txt', encoding="utf8") as f:
     with open('dialogues/scored/chan_dialogues_scored_tox.csv', 'w', encoding="utf8") as csv_f:
         
         writer = csv.writer(csv_f)
@@ -23,15 +23,9 @@ with open('dialogues/raw/chan_dialogues_test.txt', encoding="utf8") as f:
         for lines_list in dialogue:
             
             lines_list = [line.strip() for line in lines_list.split('- ')[1:]]
-            tox_list = []
-            
-            for line in lines_list:
-                tox_score = round(get_toxicity(line), 3)
-                tox_list.append(tox_score)
+            tox_score = round(get_toxicity(lines_list[1]), 3)
                 
-            if any(tox_list) > 0.93:
-                writer.writerow(lines_list)
-                        
-            tox_list.clear()
-              
+            if tox_score > 0.93:
+                writer.writerow(lines_list[:2])
+                               
 print('Done')
