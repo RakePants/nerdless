@@ -1,2 +1,2 @@
 # nerdless
-A chat bot for Telegram groups implements NLP
+A chat bot for Telegram groups that implements NLP
