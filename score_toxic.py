@@ -8,6 +8,7 @@ model = AutoModelForSequenceClassification.from_pretrained("sismetanin/rubert-to
 
 def get_toxicity(input):
     inputs = tokenizer(input, return_tensors="pt")
+    
     with torch.no_grad():
         logits = model(**inputs).logits[0]
     tox_score = logits.softmax(dim=-1).tolist()[1]
