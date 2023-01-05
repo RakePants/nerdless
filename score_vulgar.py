@@ -26,6 +26,7 @@ with open('dialogues/raw/chan_dialogues.txt', encoding="utf8") as f:
             lines_list = [line.strip() for line in lines_list.split('- ')[1:]]
             vulgarity_scores = get_vulgarity(lines_list[1])   
             
+            #choose line if at least one of 3 labels is > 0.4
             if any(score > 0.4 for score in vulgarity_scores):
                 writer.writerow(lines_list[:2])
                                               
