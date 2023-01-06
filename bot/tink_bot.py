@@ -10,8 +10,10 @@ tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
 model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/tink')
 model = model.to('cpu')
 
-bot_token = open("C:/Users/Миша/PycharmProjects/nlp/token.txt").readline()
+BOT_TOKEN_PATH = "C:/Users/Миша/PycharmProjects/nlp/token.txt"
+bot_token = open(BOT_TOKEN_PATH).readline()
 bot = Bot(token=bot_token)
+BOT_ID = 5616329848
 dp = Dispatcher(bot)
 
 
@@ -57,29 +59,26 @@ def gener(input):
     
 
 history = ""
-counter_text = 1
 num_msg = 0
+
 @dp.message_handler()
 async def tink(message : types.message):
     
     global num_msg
     global counter_text
-    global text
+    global history
     num_msg += 1
     
     if (num_msg > 5):
+        history = ""
         await message.reply(gener("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ "))
         num_msg = 0
         
-    elif message.reply_to_message and message.reply_to_message['from']["id"] == 5616329848:
-        counter_text += 1
+    elif message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID:
         response = gener(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
         history = history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         await message.reply(response)
         num_msg = 0
-
-        # # # await message.reply(message.text)
-        # await bot.send_message(message.from_user.id, message.text)
 
 
 executor.start_polling(dp, skip_updates=True)
