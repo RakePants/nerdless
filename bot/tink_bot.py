@@ -21,13 +21,12 @@ async def start(message : types.message):
     await message.answer("Бот запущен")
 
 
-num_msg = 0
+c = 0
 @dp.message_handler()
 async def tink(message : types.message):
-    
-    global num_msg
-    num_msg  += 1
-    if (num_msg > 5) or (message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID):
+    global c
+    c+=1
+    if (c > 5) or (message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID):
         
         model = model.to('cpu')
         inputs = tokenizer("@@ПЕРВЫЙ@@ " + str(message.text.lower()) + " @@ВТОРОЙ@@ ", return_tensors='pt')
@@ -53,12 +52,12 @@ async def tink(message : types.message):
             s = s[2:]
         s.replace('<pad>', '')
         s.replace('�', '')
-        for ch in ['))', '((', '!!!', '???', '(num_msg', '(с', '11', '00', 'адин']:
+        for ch in ['))', '((', '!!!', '???', '(c', '(с', '11', '00', 'адин']:
             if ch in s:
                 s = s.partition(ch)[0]
         
         await message.reply(s)
-        num_msg = 0
+        c = 0
 
         # # # await message.reply(message.text)
         # await bot.send_message(message.from_user.id, message.text)
