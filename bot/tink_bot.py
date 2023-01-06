@@ -71,8 +71,10 @@ async def tink(message : types.message):
     
     if (num_msg > 5):
         history = ""
-        await message.reply(gener("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ "))
+        response = gener("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+        await message.reply(response)
         num_msg = 0
+        history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         
     elif message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID:
         response = gener(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
