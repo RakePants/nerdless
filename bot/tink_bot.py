@@ -3,6 +3,7 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 import asyncio
 import random
+import re
 from transformers import AutoTokenizer, AutoModelWithLMHead
 
 
@@ -19,11 +20,11 @@ dp = Dispatcher(bot)
 history = ""
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("Я здесь але")
-    history = "@@ВТОРОЙ@@ " + "Я здесь але"
+    await message.answer("Я здесь")
+    history = "@@ВТОРОЙ@@ " + "Я здесь"
 
-
-def gener(input):
+# answer generation and handling
+def generate(input):
     inputs = tokenizer(str(input), return_tensors='pt')
     
     generated_token_ids = model.generate(
@@ -51,12 +52,14 @@ def gener(input):
         
     if '.' in response[:3]:
         response = response.replace('.', '')
-
+    
+    response = re.sub("/b/$", "", response)
     response = response.replace('<pad>', '')
     response = response.replace('�', '')
     response = response.replace('тред', 'чат')
     response = response.replace('тхреад', 'чат')
     response = response.replace('Тред', 'Чат')
+    response = response.replace('/b/', 'тг')
     
     for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', '(C','()', 'адин']:
         if ch in response:
@@ -76,7 +79,7 @@ async def tink(message : types.message):
     
     if (num_msg > 5):
         history = ""
-        response = gener("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+        response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
         await message.reply(response)
         num_msg = 0
         history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
@@ -88,7 +91,7 @@ async def tink(message : types.message):
             num_msg = 0
         else:
             num_msg = 0
-            response = gener(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+            response = generate(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
             history = history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
             await message.reply(response)
 
