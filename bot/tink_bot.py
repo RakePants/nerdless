@@ -50,8 +50,8 @@ def generate(input):
     if ', ' in response[:4]:
         response = response.replace(', ', '')
         
-    if '.' in response[:3]:
-        response = response.replace('.', '')
+    if '. ' in response[:4]:
+        response = response.replace('. ', '')
     
     response = re.sub("/b/$", "", response)
     response = response.replace('<pad>', '')
