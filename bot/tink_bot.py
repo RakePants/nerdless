@@ -56,7 +56,7 @@ def gener(input):
     return response
     
 
-text = ""
+history = ""
 counter_text = 1
 num_msg = 0
 @dp.message_handler()
@@ -68,16 +68,15 @@ async def tink(message : types.message):
     num_msg += 1
     
     if (num_msg > 5):
-        text = gener("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@")[0]
-        await message.reply(text.split("@@ВТОРОЙ@@")[1])
+        await message.reply(gener("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ "))
         num_msg = 0
-        counter_text = 1
+        
     elif message.reply_to_message and message.reply_to_message['from']["id"] == 5616329848:
         counter_text += 1
-        text1 = gener(text + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@")[0]
-        await message.reply(text1.split("@@ВТОРОЙ@@")[counter_text])
+        response = gener(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+        history = history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+        await message.reply(response)
         num_msg = 0
-        text = text1
 
         # # # await message.reply(message.text)
         # await bot.send_message(message.from_user.id, message.text)
