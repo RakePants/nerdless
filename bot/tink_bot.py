@@ -17,7 +17,7 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("пук пук")
+    await message.answer("Бот запущен")
 
 
 c = 0
@@ -26,23 +26,36 @@ async def tink(message : types.message):
     global c
     c+=1
     if (c > 5) or (message.reply_to_message and message.reply_to_message['from']["id"] == 5616329848):
-        inputs = tokenizer("@@ПЕРВЫЙ@@ " + str(message.text.lower()) + " @@ВТОРОЙ@@", return_tensors='pt')
+        
+        model = model.to('cpu')
+        inputs = tokenizer("@@ПЕРВЫЙ@@ " + str(message.text.lower()) + " @@ВТОРОЙ@@ ", return_tensors='pt')
         generated_token_ids = model.generate(
             **inputs,
             top_k=10,
             top_p=0.95,
-            num_beams=1,
+            num_beams=3,
             num_return_sequences=1,
             do_sample=True,
-            no_repeat_ngram_size=2,
-            temperature=0.1,
-            repetition_penalty=1.2,
+            no_repeat_ngram_size=1,
+            temperature=1.0,
+            repetition_penalty=2.0,
             length_penalty=1.0,
             eos_token_id=50257,
-            max_new_tokens=20
+            max_new_tokens=48
         )
+
         context_with_response = [tokenizer.decode(sample_token_ids) for sample_token_ids in generated_token_ids]
-        await message.reply(context_with_response[0].split("@@ВТОРОЙ@@")[1])
+
+        s = context_with_response[0].split('@@')[-1].strip()
+        if s[:2] == ', ':
+            s = s[2:]
+        s.replace('<pad>', '')
+        s.replace('�', '')
+        for ch in ['))', '((', '!!!', '???', '(c', '(с', '11', '00', 'адин']:
+            if ch in s:
+                s = s.partition(ch)[0]
+        
+        await message.reply(s)
         c = 0
 
         # # # await message.reply(message.text)
