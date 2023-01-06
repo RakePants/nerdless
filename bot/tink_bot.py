@@ -4,26 +4,23 @@ from aiogram.utils import executor
 import asyncio
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
+
+PATH_TO_MODEL = 'C:/Users/Миша/PycharmProjects/nlp/tink'
 tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
-model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/tink')
+model = AutoModelWithLMHead.from_pretrained(PATH_TO_MODEL)
 
-
-
-bot_token = open("C:/Users/Миша/PycharmProjects/nlp/token.txt").readline()
+PATH_TO_BOT_TOKEN = "C:/Users/Миша/PycharmProjects/nlp/token.txt"
+bot_token = open(PATH_TO_BOT_TOKEN).readline()
 bot = Bot(token="bot_token")
 dp = Dispatcher(bot)
-
-
-
-
 
 
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
     await message.answer("пук пук")
 
-c = 0
 
+c = 0
 @dp.message_handler()
 async def tink(message : types.message):
     global c
@@ -50,8 +47,6 @@ async def tink(message : types.message):
 
         # # # await message.reply(message.text)
         # await bot.send_message(message.from_user.id, message.text)
-
-
 
 
 executor.start_polling(dp, skip_updates=True)
