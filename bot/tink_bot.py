@@ -7,19 +7,20 @@ from transformers import AutoTokenizer, AutoModelWithLMHead
 
 
 tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
-model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/tink')
+model = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_sad1')
 model = model.to('cpu')
 
-BOT_TOKEN_PATH = "C:/Users/Миша/PycharmProjects/nlp/token.txt"
+BOT_TOKEN_PATH = "token.txt"
 bot_token = open(BOT_TOKEN_PATH).readline()
 bot = Bot(token=bot_token)
 BOT_ID = 5616329848
 dp = Dispatcher(bot)
 
-
+history = ""
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("Я здесь")
+    await message.answer("Я здесь але")
+    history = "@@ВТОРОЙ@@ " + "Я здесь але"
 
 
 def gener(input):
@@ -45,22 +46,26 @@ def gener(input):
     # raw response handling
     response = context_with_response[0].split('@@')[-1].strip()
     
-    if response[:2] == ', ':
-        response = response[2:]
+    if ', ' in response[:4]:
+        response = response.replace(', ', '')
         
+    if '.' in response[:3]:
+        response = response.replace('.', '')
+
     response = response.replace('<pad>', '')
     response = response.replace('�', '')
+    response = response.replace('тред', 'чат')
+    response = response.replace('тхреад', 'чат')
+    response = response.replace('Тред', 'Чат')
     
-    for ch in ['))', '((', '!!!', '???', '(c', '(с', '()', 'адин']:
+    for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', '(C','()', 'адин']:
         if ch in response:
             response = response.partition(ch)[0]
     
     return response
     
 
-history = ""
 num_msg = 0
-
 @dp.message_handler()
 async def tink(message : types.message):
     
@@ -77,10 +82,15 @@ async def tink(message : types.message):
         history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         
     elif message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID:
-        response = gener(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
-        history = history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
-        await message.reply(response)
-        num_msg = 0
+        if message.text.lower() == "хватит":
+            history = ""
+            await message.reply("ладно")
+            num_msg = 0
+        else:
+            num_msg = 0
+            response = gener(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+            history = history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+            await message.reply(response)
 
 
 executor.start_polling(dp, skip_updates=True)
