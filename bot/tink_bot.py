@@ -5,12 +5,12 @@ import asyncio
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
 tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
-model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/nerdless_trained_vulgar1')
+model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/tink')
 
 
 
-
-bot = Bot(token="5616329848:AAEMYlp2rYunBGxrCoeyw7n40WsohaNb-g4")
+bot_token = open("C:/Users/Миша/PycharmProjects/nlp/token.txt").readline()
+bot = Bot(token=bot_token)
 dp = Dispatcher(bot)
 
 
