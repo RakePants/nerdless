@@ -2,13 +2,12 @@ from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 import asyncio
-import random
 import re
 from transformers import AutoTokenizer, AutoModelWithLMHead
 
 
 tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
-model = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_sad1')
+model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/nerdless_trained_sad1')
 model = model.to('cpu')
 
 BOT_TOKEN_PATH = "token.txt"
@@ -21,12 +20,12 @@ history = ""
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
     await message.answer("Я здесь")
+    global history
     history = "@@ВТОРОЙ@@ " + "Я здесь"
 
 # answer generation and handling
-def generate(input):
+def generate(input,username):
     inputs = tokenizer(str(input), return_tensors='pt')
-    
     generated_token_ids = model.generate(
         **inputs,
         top_k=10,
@@ -43,6 +42,7 @@ def generate(input):
     )
 
     context_with_response = [tokenizer.decode(sample_token_ids) for sample_token_ids in generated_token_ids]
+    print(context_with_response)
 
     # raw response handling
     response = context_with_response[0].split('@@')[-1].strip()
@@ -60,6 +60,8 @@ def generate(input):
     response = response.replace('тхреад', 'чат')
     response = response.replace('Тред', 'Чат')
     response = response.replace('/b/', 'тг')
+    response = response.replace("анон", username)
+    response = response.replace("Анон", username)
     
     for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', '(C','()', 'адин']:
         if ch in response:
@@ -71,15 +73,14 @@ def generate(input):
 num_msg = 0
 @dp.message_handler()
 async def tink(message : types.message):
-    
+
     global num_msg
-    global counter_text
     global history
     num_msg += 1
     
     if (num_msg > 5):
         history = ""
-        response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+        response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'])
         await message.reply(response)
         num_msg = 0
         history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
@@ -91,7 +92,7 @@ async def tink(message : types.message):
             num_msg = 0
         else:
             num_msg = 0
-            response = generate(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ")
+            response = generate(history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ", message['from']['first_name'])
             history = history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
             await message.reply(response)
 
