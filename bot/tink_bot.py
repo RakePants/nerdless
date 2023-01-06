@@ -48,10 +48,10 @@ def gener(input):
     if response[:2] == ', ':
         response = response[2:]
         
-    response.replace('<pad>', '')
-    response.replace('�', '')
+    response = response.replace('<pad>', '')
+    response = response.replace('�', '')
     
-    for ch in ['))', '((', '!!!', '???', '(c', '(с', '()', '11', '00', 'адин']:
+    for ch in ['))', '((', '!!!', '???', '(c', '(с', '()', 'адин']:
         if ch in response:
             response = response.partition(ch)[0]
     
