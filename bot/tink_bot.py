@@ -10,6 +10,7 @@ tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
 model = AutoModelWithLMHead.from_pretrained(PATH_TO_MODEL)
 
 PATH_TO_BOT_TOKEN = "C:/Users/Миша/PycharmProjects/nlp/token.txt"
+BOT_ID = 5616329848
 bot_token = open(PATH_TO_BOT_TOKEN).readline()
 bot = Bot(token="bot_token")
 dp = Dispatcher(bot)
@@ -25,7 +26,7 @@ c = 0
 async def tink(message : types.message):
     global c
     c+=1
-    if (c > 5) or (message.reply_to_message and message.reply_to_message['from']["id"] == 5616329848):
+    if (c > 5) or (message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID):
         
         model = model.to('cpu')
         inputs = tokenizer("@@ПЕРВЫЙ@@ " + str(message.text.lower()) + " @@ВТОРОЙ@@ ", return_tensors='pt')
