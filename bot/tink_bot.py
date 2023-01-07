@@ -1,13 +1,13 @@
+import re
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 import asyncio
-import re
 from transformers import AutoTokenizer, AutoModelWithLMHead
 
 
-tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-small')
-model = AutoModelWithLMHead.from_pretrained('C:/Users/Миша/PycharmProjects/nlp/nerdless_trained_sad1')
+tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-medium')
+model = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_sad1')
 model = model.to('cpu')
 
 BOT_TOKEN_PATH = "token.txt"
@@ -16,15 +16,17 @@ bot = Bot(token=bot_token)
 BOT_ID = 5616329848
 dp = Dispatcher(bot)
 
+
 history = ""
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("Я здесь")
+    await message.answer("Я здесь" + u'🤖')
     global history
-    history = "@@ВТОРОЙ@@ " + "Я здесь"
+    history = "@@ВТОРОЙ@@ " + "Я здесь " + u'🤖'
+
 
 # answer generation and handling
-def generate(input,username):
+def generate(input, username):
     inputs = tokenizer(str(input), return_tensors='pt')
     generated_token_ids = model.generate(
         **inputs,
@@ -38,7 +40,7 @@ def generate(input,username):
         repetition_penalty=2.0,
         length_penalty=1.0,
         eos_token_id=50257,
-        max_new_tokens=40
+        max_new_tokens=48
     )
 
     context_with_response = [tokenizer.decode(sample_token_ids) for sample_token_ids in generated_token_ids]
@@ -47,21 +49,13 @@ def generate(input,username):
     # raw response handling
     response = context_with_response[0].split('@@')[-1].strip()
     
-    if ', ' in response[:4]:
-        response = response.replace(', ', '')
-        
-    if '. ' in response[:4]:
-        response = response.replace('. ', '')
-    
-    response = re.sub("/b/$", "", response)
     response = response.replace('<pad>', '')
     response = response.replace('�', '')
-    response = response.replace('тред', 'чат')
-    response = response.replace('тхреад', 'чат')
-    response = response.replace('Тред', 'Чат')
-    response = response.replace('/b/', 'тг')
-    response = response.replace("анон", username)
-    response = response.replace("Анон", username)
+    response = re.sub("^[.,] ", "", response)
+    response = re.sub("/b?.$", "", response)
+    response = re.sub('/b?.', u'🤖', response)
+    response = re.sub('[тТ]ре?[а-я]д', 'чат', response)
+    response = re.sub("[Аа]нон?[а-я]", username, response)
     
     for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', '(C','()', 'адин']:
         if ch in response:
@@ -88,7 +82,7 @@ async def tink(message : types.message):
     elif message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID:
         if message.text.lower() == "хватит":
             history = ""
-            await message.reply("ладно")
+            await message.reply("ладно, проехали")
             num_msg = 0
         else:
             num_msg = 0
