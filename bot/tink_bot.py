@@ -52,10 +52,10 @@ def generate(input, username):
     response = response.replace('<pad>', '')
     response = response.replace('�', '')
     response = re.sub("^[.,] ", "", response)
-    response = re.sub("/b?.$", "", response)
-    response = re.sub('/b?.', u'🤖', response)
-    response = re.sub('[тТ]ре?[а-я]д', 'чат', response)
-    response = re.sub("[Аа]нон?[а-я]", username, response)
+    response = re.sub("/b.?$", "", response)
+    response = re.sub('/b.?', u'🤖', response)
+    response = re.sub('[тТ]ре[а-я]д?', 'чат', response)
+    response = re.sub("[Аа]нон[а-я]?", username, response)
     
     for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', '(C','()', 'адин']:
         if ch in response:
