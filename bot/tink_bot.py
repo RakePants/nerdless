@@ -72,14 +72,14 @@ async def tink(message : types.message):
     global history
     num_msg += 1
     
-    if (num_msg > 5):
+    if (num_msg > 5) or ('@testnalohabot' in message.text.lower()):
         history = ""
         response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'])
         await message.reply(response)
         num_msg = 0
         history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         
-    elif message.reply_to_message and message.reply_to_message['from']["id"] == BOT_ID:
+    elif message.reply_to_message and (message.reply_to_message['from']["id"] == BOT_ID):
         if message.text.lower() == "хватит":
             history = ""
             await message.reply("ладно, проехали")
