@@ -5,9 +5,9 @@ from aiogram.utils import executor
 from transformers import AutoTokenizer, AutoModelWithLMHead
 
 tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-medium')
-model_sad = AutoModelWithLMHead.from_pretrained('./weights/sad')
-model_toxic = AutoModelWithLMHead.from_pretrained('./weights/toxic')
-model_vulgar = AutoModelWithLMHead.from_pretrained('./weights/vulgar')
+model_sad = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_sad1')
+model_toxic = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained5')
+model_vulgar = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_vulgar1')
 
 BOT_TOKEN_PATH = "token.txt"
 bot_token = open(BOT_TOKEN_PATH).readline()
@@ -20,31 +20,45 @@ dp = Dispatcher(bot)
 history_dict = dict()
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("Я здесь " + u'🤖' + " по стандарту выбран депрессивный режим")
+    await message.answer("Я здесь " + u'🤖' + '\n' + "сейчас выбран режим sad")
     global history_dict
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "; по стандарту выбран депрессивный режим", model_sad]
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad]
 
 
-@dp.message_handler(commands=["sad", "toxic", "vulgar"])
-async def change_preset(message : types.message):
+@dp.message_handler(commands=["sad"])
+async def change_to_sad(message : types.message):
     global model_sad
+    global history_dict
+    
+    await message.answer("Успешно выбран режим sad")
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad]
+    
+
+@dp.message_handler(commands=["toxic"])
+async def change_to_toxic(message : types.message):
     global model_toxic
+    global history_dict
+    
+    await message.answer("Успешно выбран режим toxic")
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic]
+
+
+@dp.message_handler(commands=["vulgar"])
+async def change_to_vulgar(message : types.message):
     global model_vulgar
     global history_dict
-    state = ""
     
-    if "sad" in message.text:
-        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad]
-        state = "sad"
-    elif "vulgar" in message.text:
-        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar]
-        state = "vulgar"
-    else:
-        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic]
-        state = "toxic"
-    await message.answer(f"Успешно выбран режим {state}")
+    await message.answer("Успешно выбран режим vulgar")
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar]
     
-
+ 
+@dp.message_handler(commands=["preset"])
+async def see_preset(message : types.message):
+    global history_dict
+    
+    await message.answer(history_dict[message.chat.id][1])
+    
+    
 # answer generation and handling
 def generate(input, username, model):
     inputs = tokenizer(str(input), return_tensors='pt')
@@ -92,8 +106,7 @@ async def tink(message : types.message):
     global history_dict
     num_msg += 1
 
-    if (num_msg > 5) or (('@' + BOT_NAME) in message.text.lower()):
-        history_dict[message.chat.id][0] = ""
+    if (num_msg > 5) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
         response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'], history_dict[message.chat.id][1])
         await message.reply(response)
         num_msg = 0
