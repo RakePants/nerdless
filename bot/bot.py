@@ -5,9 +5,9 @@ from aiogram.utils import executor
 from transformers import AutoTokenizer, AutoModelWithLMHead
 
 tokenizer = AutoTokenizer.from_pretrained('tinkoff-ai/ruDialoGPT-medium')
-model_sad = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_sad1')
-model_toxic = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained5')
-model_vulgar = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_vulgar1')
+model_sad = AutoModelWithLMHead.from_pretrained('./weights/sad')
+model_toxic = AutoModelWithLMHead.from_pretrained('./weights/toxic')
+model_vulgar = AutoModelWithLMHead.from_pretrained('./weights/vulgar')
 
 BOT_TOKEN_PATH = "token.txt"
 bot_token = open(BOT_TOKEN_PATH).readline()
@@ -31,14 +31,18 @@ async def change_preset(message : types.message):
     global model_toxic
     global model_vulgar
     global history_dict
+    state = ""
     
-    if message.text[1::] == "sad":
-        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + f"Успешно выбран режим {message.text[1::]}", model_sad]
-    elif message.text[1::] == "vulgar":
-        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + f"Успешно выбран режим {message.text[1::]}", model_vulgar]
+    if "sad" in message.text:
+        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad]
+        state = "sad"
+    elif "vulgar" in message.text:
+        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar]
+        state = "vulgar"
     else:
-        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + f"Успешно выбран режим {message.text[1::]}", model_toxic]
-    await message.answer(f"Успешно выбран режим {message.text[1::]}")
+        history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic]
+        state = "toxic"
+    await message.answer(f"Успешно выбран режим {state}")
     
 
 # answer generation and handling
