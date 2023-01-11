@@ -95,10 +95,10 @@ def generate(input, username, model):
     response = re.sub("^[.,] ", "", response)
     response = re.sub("/b.?$", "", response)
     response = re.sub('/b.?', u'🤖', response)
-    response = re.sub('[тТ]ре[а-я]д?', 'чат', response)
+    response = re.sub('[тТ]х?ре[а-я]?д', 'чат', response)
     response = re.sub("[Аа]нон[а-я]*", username, response)
 
-    for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', ')(', '(C','()', 'адин']:
+    for ch in ['))', '((', '!!!', '???', '(c', '(с', '(С', '(C','()', ')(', 'адин']:
         if ch in response:
             response = response.partition(ch)[0]
 
