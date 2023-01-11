@@ -62,8 +62,8 @@ async def change_to_vulgar(message : types.message):
 async def see_preset(message : types.message):
     global history_dict
     
-    await message.answer(u'⚫' + "Сейчас выбран режим " + history_dict[message.chat.id][2])
-    history_dict[message.chat.id][0] = u'⚫' + "@@ВТОРОЙ@@ " + "Сейчас выбран режим " + history_dict[message.chat.id][2]
+    await message.answer(u'⚫' + "Сейчас выбран " + history_dict[message.chat.id][2])
+    history_dict[message.chat.id][0] = u'⚫' + "@@ВТОРОЙ@@ " + "Сейчас выбран " + history_dict[message.chat.id][2]
     
     
 # answer generation and handling
