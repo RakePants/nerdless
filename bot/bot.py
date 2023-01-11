@@ -23,7 +23,7 @@ history_dict = dict()
 async def start(message : types.message):
     await message.answer("Я здесь " + u'🤖' + '\n' + "сейчас выбран режим sad")
     global history_dict
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad, "режим sad"]
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad, "режим sad", 0]
     
     
 @dp.message_handler(commands=["help"])
@@ -37,7 +37,7 @@ async def change_to_sad(message : types.message):
     global history_dict
     
     await message.answer(u'⚫' + " Успешно выбран режим sad")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad, "режим sad " + u'😰']
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad, "режим sad " + u'😰', 0]
     
 
 @dp.message_handler(commands=["toxic"])
@@ -46,7 +46,7 @@ async def change_to_toxic(message : types.message):
     global history_dict
     
     await message.answer(u'⚫' + " Успешно выбран режим toxic")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic, "режим toxic " + u'😡']
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic, "режим toxic " + u'😡', 0]
 
 
 @dp.message_handler(commands=["vulgar"])
@@ -55,7 +55,7 @@ async def change_to_vulgar(message : types.message):
     global history_dict
     
     await message.answer(u'⚫' + " Успешно выбран режим vulgar")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar, "режим vulgar " + u'🍑']
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar, "режим vulgar " + u'🍑', 0]
     
  
 @dp.message_handler(commands=["preset"])
@@ -105,13 +105,12 @@ def generate(input, username, model):
     return response
 
 
-num_msg = 0
 @dp.message_handler(commands=["end"])
 async def end_dialogue(message : types.message):
     global history_dict
-    global num_msg
+
     history_dict[message.chat.id][0] = ""
-    num_msg = 0
+    history_dict[message.chat.id][3] = 0
     
     await message.reply("ладно, проехали")
     
@@ -119,21 +118,20 @@ async def end_dialogue(message : types.message):
 @dp.message_handler()
 async def tink(message : types.message):
 
-    global num_msg
     global history_dict
-    num_msg += 1
+    history_dict[message.chat.id][3] += 1
 
     if message.reply_to_message and (message.reply_to_message['from']["id"] == BOT_ID):
-        num_msg = 0
+        history_dict[message.chat.id][3] = 0
         response = generate(history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ", message['from']['first_name'], history_dict[message.chat.id][1])
         history_dict[message.chat.id][0] = history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         await message.reply(response)
 
-    elif (num_msg > choice([5, 6, 7, 8])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
+    elif (history_dict[message.chat.id][3] > choice([5, 6, 7, 8])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
+        history_dict[message.chat.id][3] = 0
         response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'], history_dict[message.chat.id][1])
-        await message.reply(response)
-        num_msg = 0
         history_dict[message.chat.id][0] = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+        await message.reply(response)
 
 
 executor.start_polling(dp, skip_updates=True)
