@@ -1,4 +1,5 @@
 import re
+from random import choice
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
@@ -22,7 +23,12 @@ history_dict = dict()
 async def start(message : types.message):
     await message.answer("Я здесь " + u'🤖' + '\n' + "сейчас выбран режим sad")
     global history_dict
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad]
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad, "режим sad"]
+    
+    
+@dp.message_handler(commands=["help"])
+async def send_help(message : types.message):
+    await message.reply("/start - перезапуск бота.\n\nВ боте реализовано 3 режима: toxic, sad, vulgar. Между ними можно переключаться по командам /toxic, /sad, /vulgar.\n/preset - просмотреть режим\n\nБот самостоятельно отвечает на случайные сообщения.\nМожно принудительно начать диалог с ботом, упомянув его: @nerdless_bot <сообщение>.\nЧтобы начать диалог с ботом, когда он уже что-либо написал, используйте функцию reply. Бот будет помнить все сообщения такой цепочки.\nЧтобы закончить такой диалог с ботом и очистить его память, используйте /end.")
 
 
 @dp.message_handler(commands=["sad"])
@@ -30,8 +36,8 @@ async def change_to_sad(message : types.message):
     global model_sad
     global history_dict
     
-    await message.answer("Успешно выбран режим sad")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad]
+    await message.answer(u'⚫' + " Успешно выбран режим sad")
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad, "режим sad " + u'😰']
     
 
 @dp.message_handler(commands=["toxic"])
@@ -39,8 +45,8 @@ async def change_to_toxic(message : types.message):
     global model_toxic
     global history_dict
     
-    await message.answer("Успешно выбран режим toxic")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic]
+    await message.answer(u'⚫' + " Успешно выбран режим toxic")
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic, "режим toxic " + u'😡']
 
 
 @dp.message_handler(commands=["vulgar"])
@@ -48,20 +54,21 @@ async def change_to_vulgar(message : types.message):
     global model_vulgar
     global history_dict
     
-    await message.answer("Успешно выбран режим vulgar")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar]
+    await message.answer(u'⚫' + " Успешно выбран режим vulgar")
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar, "режим vulgar " + u'🍑']
     
  
 @dp.message_handler(commands=["preset"])
 async def see_preset(message : types.message):
     global history_dict
     
-    await message.answer(history_dict[message.chat.id][1])
+    await message.answer(u'⚫' + "Сейчас выбран режим " + history_dict[message.chat.id][2])
+    history_dict[message.chat.id][0] = u'⚫' + "@@ВТОРОЙ@@ " + "Сейчас выбран режим " + history_dict[message.chat.id][2]
     
     
 # answer generation and handling
 def generate(input, username, model):
-    inputs = tokenizer(str(input), return_tensors='pt')
+    inputs = tokenizer(input, return_tensors='pt')
     generated_token_ids = model.generate(
         **inputs,
         top_k=10,
@@ -99,6 +106,16 @@ def generate(input, username, model):
 
 
 num_msg = 0
+@dp.message_handler(commands=["end"])
+async def end_dialogue(message : types.message):
+    global history_dict
+    global num_msg
+    history_dict[message.chat.id][0] = ""
+    num_msg = 0
+    
+    await message.reply("ладно, проехали")
+    
+
 @dp.message_handler()
 async def tink(message : types.message):
 
@@ -106,22 +123,17 @@ async def tink(message : types.message):
     global history_dict
     num_msg += 1
 
-    if (num_msg > 5) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
+    if message.reply_to_message and (message.reply_to_message['from']["id"] == BOT_ID):
+        num_msg = 0
+        response = generate(history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ", message['from']['first_name'], history_dict[message.chat.id][1])
+        history_dict[message.chat.id][0] = history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+        await message.reply(response)
+
+    elif (num_msg > choice([5, 6, 7, 8])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
         response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'], history_dict[message.chat.id][1])
         await message.reply(response)
         num_msg = 0
         history_dict[message.chat.id][0] = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
-
-    elif message.reply_to_message and (message.reply_to_message['from']["id"] == BOT_ID):
-        if message.text.lower().strip() == "хватит":
-            history_dict[message.chat.id][0] = ""
-            await message.reply("ладно, проехали")
-            num_msg = 0
-        else:
-            num_msg = 0
-            response = generate(history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ", message['from']['first_name'], history_dict[message.chat.id][1])
-            history_dict[message.chat.id] = history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
-            await message.reply(response)
 
 
 executor.start_polling(dp, skip_updates=True)
