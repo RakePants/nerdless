@@ -13,7 +13,7 @@ model_vulgar = AutoModelWithLMHead.from_pretrained('../weights/nerdless_trained_
 BOT_TOKEN_PATH = "token.txt"
 bot_token = open(BOT_TOKEN_PATH).readline()
 bot = Bot(token=bot_token)
-BOT_ID = 5584464059
+BOT_ID = int(bot_token.split(':')[0])
 BOT_NAME = "nerdless_bot"
 dp = Dispatcher(bot)
 
@@ -28,7 +28,7 @@ async def start(message : types.message):
     
 @dp.message_handler(commands=["help"])
 async def send_help(message : types.message):
-    await message.reply("/start - перезапуск бота.\n\nВ боте реализовано 3 режима: toxic, sad, vulgar. Между ними можно переключаться по командам /toxic, /sad, /vulgar.\n/preset - просмотреть режим\n\nБот самостоятельно отвечает на случайные сообщения.\nМожно принудительно начать диалог с ботом, упомянув его: @nerdless_bot <сообщение>.\nЧтобы начать диалог с ботом, когда он уже что-либо написал, используйте функцию reply. Бот будет помнить все сообщения такой цепочки.\nЧтобы закончить такой диалог с ботом и очистить его память, используйте /end.")
+    await message.reply("/start - перезапуск бота.\n\nВ боте реализовано 3 режима: toxic, sad, vulgar. Между ними можно переключаться по командам /toxic, /sad, /vulgar.\n/preset - просмотреть режим\n\nБот самостоятельно отвечает на случайные сообщения.\nМожно принудительно начать диалог с ботом, упомянув его: @nerdless_bot <сообщение>.\n\nЧтобы начать диалог с ботом, когда он уже что-либо написал, используйте функцию reply. Бот будет помнить все сообщения такой цепочки.\nЧтобы закончить такой диалог с ботом и очистить его память, используйте /end.")
 
 
 @dp.message_handler(commands=["sad"])
@@ -85,7 +85,7 @@ def generate(input, username, model):
     )
 
     context_with_response = [tokenizer.decode(sample_token_ids) for sample_token_ids in generated_token_ids]
-    print(context_with_response)
+    #print(context_with_response)
 
     # raw response handling
     response = context_with_response[0].split('@@')[-1].strip()
