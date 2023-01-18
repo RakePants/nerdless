@@ -2,7 +2,7 @@
 An AI chat bot for Telegram groups with 3 presets and an ability to participate in continious dialogues.
 
 ## About
-The bot has 3 presets: toxic, sad, vulgar. These can be switched in a chat by user with a help of commands anytime.
+The bot has 3 presets: toxic, sad, vulgar. These can be switched in a chat a by user with a help of commands anytime.
 
 It can automatically respond to random messages.
 You can force a conversation with the bot by mentioning it.
