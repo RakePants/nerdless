@@ -19,7 +19,7 @@ toxicity: https://huggingface.co/sismetanin/rubert-toxic-pikabu-2ch with `score 
 obscenity: https://huggingface.co/apanc/russian-sensitive-topics \
 sadness: https://huggingface.co/cointegrated/rubert-tiny2-cedr-emotion-detection with `score > 0.8`
 
-Scripts are available in this repository.
+Scoring scripts are available in this repository.
 
 Finetuned https://huggingface.co/tinkoff-ai/ruDialoGPT-medium model on these 3 datasets indepently using `transformers`.\
 Colab Notebooks of the process are also available.
