@@ -24,7 +24,7 @@ Scoring scripts are available in this repository.
 Finetuned https://huggingface.co/tinkoff-ai/ruDialoGPT-medium model on these 3 datasets indepently using `transformers`.\
 Colab Notebooks of the process are also available.
 
-Used AIOgram for the development of an asynchronous Telegram bot.
+Used AIOgram to develop an asynchronous Telegram bot.
 
 ## Usage
 For now, the bot is private due to hosting limits.
