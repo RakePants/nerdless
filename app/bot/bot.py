@@ -70,15 +70,31 @@ async def see_preset(message : types.message):
 @dp.message_handler(commands=["cooldown"])
 async def set_cooldown(message : types.message):
     global history_dict
-    if (len(message.text.split(' ')) == 3) and (int(message.text.split(' ')[1]) <= int(message.text.split(' ')[2])):
-        cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[2])
-    elif (len(message.text.split(' ')) == 2):
-        cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[1])
-    else:
+    try:
+        if all(int(i) > 0 for i in message.text.split(' ')[1:]):
+            if (len(message.text.split(' ')) == 3) and (int(message.text.split(' ')[1]) <= int(message.text.split(' ')[2])):
+                cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[2])
+                
+                history_dict[message.chat.id][4] = cooldown_tuple
+                await message.answer(u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений')
+                history_dict[message.chat.id][0] = u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений'
+                
+            elif (len(message.text.split(' ')) == 2):
+                cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[1])
+                
+                history_dict[message.chat.id][4] = cooldown_tuple
+                await message.answer(u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений')
+                history_dict[message.chat.id][0] = u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений'
+            else:
+                raise Exception()
+
+        else:
+            raise Exception()
+        
+    except:
         await message.answer(u'⚫' + "Введите команду правильно")
-    history_dict[message.chat.id][4] = cooldown_tuple
-    await message.answer(u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений')
-    history_dict[message.chat.id][0] = u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений'
+    
+        
 
 @dp.message_handler(commands=["end"])
 async def end_dialogue(message : types.message):
