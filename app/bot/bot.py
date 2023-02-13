@@ -19,11 +19,12 @@ dp = Dispatcher(bot)
 
 
 history_dict = dict()
+# history_dict = {chat_id_1: [history, model_name, model_name_text, msg_count, cooldown], chat_id_2: [...]...}
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
     await message.answer("Я здесь " + u'🤖' + '\n' + "сейчас выбран режим sad")
     global history_dict
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad, "режим sad", 0]
+    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad, "режим sad", 0, (5, 9)]
     
     
 @dp.message_handler(commands=["help"])
@@ -37,7 +38,7 @@ async def change_to_sad(message : types.message):
     global history_dict
     
     await message.answer(u'⚫' + " Успешно выбран режим sad")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad, "режим sad " + u'😰', 0]
+    history_dict[message.chat.id][0:4] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad, "режим sad " + u'😰', 0]
     
 
 @dp.message_handler(commands=["toxic"])
@@ -46,7 +47,7 @@ async def change_to_toxic(message : types.message):
     global history_dict
     
     await message.answer(u'⚫' + " Успешно выбран режим toxic")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic, "режим toxic " + u'😡', 0]
+    history_dict[message.chat.id][0:4] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic, "режим toxic " + u'😡', 0]
 
 
 @dp.message_handler(commands=["vulgar"])
@@ -55,7 +56,7 @@ async def change_to_vulgar(message : types.message):
     global history_dict
     
     await message.answer(u'⚫' + " Успешно выбран режим vulgar")
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar, "режим vulgar " + u'🍑', 0]
+    history_dict[message.chat.id][0:4] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar, "режим vulgar " + u'🍑', 0]
     
  
 @dp.message_handler(commands=["preset"])
@@ -64,8 +65,31 @@ async def see_preset(message : types.message):
     
     await message.answer(u'⚫' + "Сейчас выбран " + history_dict[message.chat.id][2])
     history_dict[message.chat.id][0] = u'⚫' + "@@ВТОРОЙ@@ " + "Сейчас выбран " + history_dict[message.chat.id][2]
+
+
+@dp.message_handler(commands=["cooldown"])
+async def set_cooldown(message : types.message):
+    global history_dict
+    if (len(message.text.split(' ')) == 3) and (int(message.text.split(' ')[1]) <= int(message.text.split(' ')[2])):
+        cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[2])
+    elif (len(message.text.split(' ')) == 2):
+        cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[1])
+    else:
+        await message.answer(u'⚫' + "Введите команду правильно")
+    history_dict[message.chat.id][4] = cooldown_tuple
+    await message.answer(u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений')
+    history_dict[message.chat.id][0] = u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений'
+
+@dp.message_handler(commands=["end"])
+async def end_dialogue(message : types.message):
+    global history_dict
+
+    history_dict[message.chat.id][0] = ""
+    history_dict[message.chat.id][3] = 0
     
+    await message.reply("ладно, проехали")
     
+        
 # answer generation and handling
 def generate(input, username, model):
     inputs = tokenizer(input, return_tensors='pt')
@@ -104,19 +128,9 @@ def generate(input, username, model):
 
     return response
 
-
-@dp.message_handler(commands=["end"])
-async def end_dialogue(message : types.message):
-    global history_dict
-
-    history_dict[message.chat.id][0] = ""
-    history_dict[message.chat.id][3] = 0
-    
-    await message.reply("ладно, проехали")
-    
-
+   
 @dp.message_handler()
-async def tink(message : types.message):
+async def send_message(message : types.message):
 
     global history_dict
     history_dict[message.chat.id][3] += 1
@@ -127,7 +141,7 @@ async def tink(message : types.message):
         history_dict[message.chat.id][0] = history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         await message.reply(response)
 
-    elif (history_dict[message.chat.id][3] > choice([5, 6, 7, 8])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
+    elif (history_dict[message.chat.id][3] >= choice(list(range(history_dict[message.chat.id][4][0], history_dict[message.chat.id][4][1] + 1)))) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
         history_dict[message.chat.id][3] = 0
         response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'], history_dict[message.chat.id][1])
         history_dict[message.chat.id][0] = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
