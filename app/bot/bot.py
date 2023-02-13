@@ -22,9 +22,9 @@ history_dict = dict()
 # history_dict = {chat_id_1: [history, model_name, model_name_text, msg_count, cooldown], chat_id_2: [...]...}
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("Я здесь " + u'🤖' + '\n' + "сейчас выбран режим sad")
+    await message.answer("Я здесь " + u'🤖' + "\nсейчас выбран режим sad" + "\ncooldown ответа 5-9 сообщений")
     global history_dict
-    history_dict[message.chat.id] = ["@@ВТОРОЙ@@ " + "Я здесь " + u'🤖' + "сейчас выбран режим sad", model_sad, "режим sad", 0, (5, 9)]
+    history_dict[message.chat.id] = ["Я здесь " + u'🤖' + "\nсейчас выбран режим sad" + "\ncooldown ответа 5-9 сообщений", model_sad, "режим sad", 0, (5, 9)]
     
     
 @dp.message_handler(commands=["help"])
@@ -71,7 +71,7 @@ async def see_preset(message : types.message):
 async def set_cooldown(message : types.message):
     global history_dict
     try:
-        if all(int(i) > 0 for i in message.text.split(' ')[1:]):
+        if all(int(i) >= 3 for i in message.text.split(' ')[1:]):
             if (len(message.text.split(' ')) == 3) and (int(message.text.split(' ')[1]) <= int(message.text.split(' ')[2])):
                 cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[2])
                 
