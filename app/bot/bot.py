@@ -164,15 +164,20 @@ async def send_message(message : types.message):
     chats_info[message.chat.id].num_msg += 1
 
     if message.reply_to_message and (message.reply_to_message['from']["id"] == BOT_ID):
-        chats_info[message.chat.id].num_msg = 0
-        response = generate(f"{chats_info[message.chat.id].history} @@ПЕРВЫЙ@@ {message.text.lower()} @@ВТОРОЙ@@ ", message['from']['first_name'], chats_info[message.chat.id].model)
-        chats_info[message.chat.id].history = chats_info[message.chat.id].history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
-        await message.reply(response)
+        if (len(message.text) <= 200) and (chats_info[message.chat.id].history.count('@@ВТОРОЙ@@') <= 4):
+            chats_info[message.chat.id].num_msg = 0
+            response = generate(f"{chats_info[message.chat.id].history} @@ПЕРВЫЙ@@ {message.text} @@ВТОРОЙ@@ ", message['from']['first_name'], chats_info[message.chat.id].model)
+            chats_info[message.chat.id].history = chats_info[message.chat.id].history + " @@ПЕРВЫЙ@@ " + message.text + " @@ВТОРОЙ@@ " + response
+            await message.reply(response)
+        else:
+            chats_info[message.chat.id].num_msg = 0
+            chats_info[message.chat.id].history = ""
+            await message.reply(f"{u'⚫'} Много букв")
 
-    elif (chats_info[message.chat.id].num_msg >= random.randint(chats_info[message.chat.id].cooldown[0], chats_info[message.chat.id].cooldown[1])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
+    elif (chats_info[message.chat.id].num_msg >= random.randint(chats_info[message.chat.id].cooldown[0], chats_info[message.chat.id].cooldown[1])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()) and (len(message.text) <= 200):
         chats_info[message.chat.id].num_msg = 0
-        response = generate(f"@@ПЕРВЫЙ@@ {message.text.lower()} @@ВТОРОЙ@@ " , message['from']['first_name'], chats_info[message.chat.id].model)
-        chats_info[message.chat.id].history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+        response = generate(f"@@ПЕРВЫЙ@@ {message.text} @@ВТОРОЙ@@ " , message['from']['first_name'], chats_info[message.chat.id].model)
+        chats_info[message.chat.id].history = "@@ПЕРВЫЙ@@ " + message.text + " @@ВТОРОЙ@@ " + response
         await message.reply(response)
 
 
