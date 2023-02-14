@@ -1,5 +1,5 @@
 import re
-from random import choice
+import random
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
@@ -17,74 +17,80 @@ BOT_ID = int(bot_token.split(':')[0])
 BOT_NAME = "nerdless_bot"
 dp = Dispatcher(bot)
 
+class ChatInfo():
+    def __init__(self):
+        self.history = ""
+        self.model = model_sad
+        self.model_name_text = "режим sad"
+        self.num_msg = 0
+        self.cooldown = (5, 9)
+               
+chats_info = dict()
+''' chats_info = {chat_id_1: ChatInfo(), 
+    chat_id_2: ChatInfo(),
+    ...}
+'''
 
-history_dict = dict()
-# history_dict = {chat_id_1: [history, model_name, model_name_text, msg_count, cooldown], chat_id_2: [...]...}
+
 @dp.message_handler(commands=["start"])
 async def start(message : types.message):
-    await message.answer("Я здесь " + u'🤖' + "\nсейчас выбран режим sad" + "\ncooldown ответа 5-9 сообщений")
-    global history_dict
-    history_dict[message.chat.id] = ["Я здесь " + u'🤖' + "\nсейчас выбран режим sad" + "\ncooldown ответа 5-9 сообщений", model_sad, "режим sad", 0, (5, 9)]
+    await message.answer(f"Бот запущен {u'🤖'}")
+    global chats_info
+    chats_info[message.chat.id] = ChatInfo()
     
     
 @dp.message_handler(commands=["help"])
 async def send_help(message : types.message):
-    await message.reply("/start - перезапуск бота.\n\nВ боте реализовано 3 режима: toxic, sad, vulgar. Между ними можно переключаться по командам /toxic, /sad, /vulgar.\n/preset - просмотреть режим\n\nБот самостоятельно отвечает на случайные сообщения.\nМожно принудительно начать диалог с ботом, упомянув его: @nerdless_bot <сообщение>.\n\nЧтобы начать диалог с ботом, когда он уже что-либо написал, используйте функцию reply. Бот будет помнить все сообщения такой цепочки.\nЧтобы закончить такой диалог с ботом и очистить его память, используйте /end.")
+    await message.reply("/start - перезапуск бота.\n\nВ боте реализовано 3 режима: toxic, sad, vulgar. Между ними можно переключаться по командам /toxic, /sad, /vulgar.\n/status -  посмотреть состояние бота\n\nБот самостоятельно отвечает на случайные сообщения.\nМожно принудительно начать диалог с ботом, упомянув его: @nerdless_bot <сообщение>.\n\nЧтобы начать диалог с ботом, когда он уже что-либо написал, используйте функцию reply. Бот будет помнить все сообщения такой цепочки.\nЧтобы закончить такой диалог с ботом и очистить его память, используйте /end.")
 
 
 @dp.message_handler(commands=["sad"])
 async def change_to_sad(message : types.message):
     global model_sad
-    global history_dict
+    global chats_info
     
-    await message.answer(u'⚫' + " Успешно выбран режим sad")
-    history_dict[message.chat.id][0:4] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим sad", model_sad, "режим sad " + u'😰', 0]
+    chats_info[message.chat.id].model = model_sad
+    chats_info[message.chat.id].model_name_text = "режим sad"
+    await message.answer(f"{u'⚫'} Успешно выбран режим sad")
     
 
 @dp.message_handler(commands=["toxic"])
 async def change_to_toxic(message : types.message):
     global model_toxic
-    global history_dict
+    global chats_info
     
-    await message.answer(u'⚫' + " Успешно выбран режим toxic")
-    history_dict[message.chat.id][0:4] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим toxic", model_toxic, "режим toxic " + u'😡', 0]
+    chats_info[message.chat.id].model = model_toxic
+    chats_info[message.chat.id].model_name_text = "режим toxic"
+    await message.answer(f"{u'⚫'} Успешно выбран режим toxic")
 
 
 @dp.message_handler(commands=["vulgar"])
 async def change_to_vulgar(message : types.message):
     global model_vulgar
-    global history_dict
+    global chats_info
     
-    await message.answer(u'⚫' + " Успешно выбран режим vulgar")
-    history_dict[message.chat.id][0:4] = ["@@ВТОРОЙ@@ " + "Успешно выбран режим vulgar", model_vulgar, "режим vulgar " + u'🍑', 0]
+    chats_info[message.chat.id].model = model_vulgar
+    chats_info[message.chat.id].model_name_text = "режим vulgar"
+    await message.answer(f"{u'⚫'} Успешно выбран режим vulgar")
+  
     
- 
-@dp.message_handler(commands=["preset"])
-async def see_preset(message : types.message):
-    global history_dict
-    
-    await message.answer(u'⚫' + "Сейчас выбран " + history_dict[message.chat.id][2])
-    history_dict[message.chat.id][0] = u'⚫' + "@@ВТОРОЙ@@ " + "Сейчас выбран " + history_dict[message.chat.id][2]
-
-
 @dp.message_handler(commands=["cooldown"])
 async def set_cooldown(message : types.message):
-    global history_dict
+    global chats_info
     try:
-        if all(int(i) >= 3 for i in message.text.split(' ')[1:]):
+        if all(int(words) >= 3 for words in message.text.split(' ')[1:]):
             if (len(message.text.split(' ')) == 3) and (int(message.text.split(' ')[1]) <= int(message.text.split(' ')[2])):
                 cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[2])
                 
-                history_dict[message.chat.id][4] = cooldown_tuple
-                await message.answer(u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений')
-                history_dict[message.chat.id][0] = u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений'
+                chats_info[message.chat.id].cooldown = cooldown_tuple
+                await message.answer(f"{u'⚫'} Cooldown ответа {str(cooldown_tuple[0])} - {str(cooldown_tuple[1])} сообщений")
                 
             elif (len(message.text.split(' ')) == 2):
                 cooldown_tuple = int(message.text.split(' ')[1]), int(message.text.split(' ')[1])
                 
-                history_dict[message.chat.id][4] = cooldown_tuple
-                await message.answer(u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений')
-                history_dict[message.chat.id][0] = u'⚫' + "Cooldown ответа " + str(cooldown_tuple[0]) + ' - ' + str(cooldown_tuple[1]) + ' сообщений'
+                chats_info[message.chat.id].cooldown = cooldown_tuple
+                await message.answer(f"{u'⚫'} Cooldown ответа {str(cooldown_tuple[0])} сообщений")
+
             else:
                 raise Exception()
 
@@ -92,18 +98,24 @@ async def set_cooldown(message : types.message):
             raise Exception()
         
     except:
-        await message.answer(u'⚫' + "Введите команду правильно")
+        await message.answer(f"{u'⚫'} Введите команду правильно")
     
-        
 
 @dp.message_handler(commands=["end"])
 async def end_dialogue(message : types.message):
-    global history_dict
+    global chats_info
 
-    history_dict[message.chat.id][0] = ""
-    history_dict[message.chat.id][3] = 0
+    chats_info[message.chat.id].history = ""
+    chats_info[message.chat.id].num_msg = 0
     
     await message.reply("ладно, проехали")
+    
+    
+@dp.message_handler(commands=["status"])
+async def see_status(message : types.message):
+    global chats_info
+    
+    await message.answer(f"{u'⚫'} Сейчас выбран {chats_info[message.chat.id].model_name_text}\nCooldown {str(chats_info[message.chat.id].cooldown[0])} - {str(chats_info[message.chat.id].cooldown[1])} сообщений\nВ чате {chats_info[message.chat.id].num_msg} сообщений") 
     
         
 # answer generation and handling
@@ -148,19 +160,19 @@ def generate(input, username, model):
 @dp.message_handler()
 async def send_message(message : types.message):
 
-    global history_dict
-    history_dict[message.chat.id][3] += 1
+    global chats_info
+    chats_info[message.chat.id].num_msg += 1
 
     if message.reply_to_message and (message.reply_to_message['from']["id"] == BOT_ID):
-        history_dict[message.chat.id][3] = 0
-        response = generate(history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ ", message['from']['first_name'], history_dict[message.chat.id][1])
-        history_dict[message.chat.id][0] = history_dict[message.chat.id][0] + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+        chats_info[message.chat.id].num_msg = 0
+        response = generate(f"{chats_info[message.chat.id].history} @@ПЕРВЫЙ@@ {message.text.lower()} @@ВТОРОЙ@@ ", message['from']['first_name'], chats_info[message.chat.id].model)
+        chats_info[message.chat.id].history = chats_info[message.chat.id].history + " @@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         await message.reply(response)
 
-    elif (history_dict[message.chat.id][3] >= choice(list(range(history_dict[message.chat.id][4][0], history_dict[message.chat.id][4][1] + 1)))) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
-        history_dict[message.chat.id][3] = 0
-        response = generate("@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " , message['from']['first_name'], history_dict[message.chat.id][1])
-        history_dict[message.chat.id][0] = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
+    elif (chats_info[message.chat.id].num_msg >= random.randint(chats_info[message.chat.id].cooldown[0], chats_info[message.chat.id].cooldown[1])) or (('@' + BOT_NAME) in message.text.lower() and '/' not in message.text.lower()):
+        chats_info[message.chat.id].num_msg = 0
+        response = generate(f"@@ПЕРВЫЙ@@ {message.text.lower()} @@ВТОРОЙ@@ " , message['from']['first_name'], chats_info[message.chat.id].model)
+        chats_info[message.chat.id].history = "@@ПЕРВЫЙ@@ " + message.text.lower() + " @@ВТОРОЙ@@ " + response
         await message.reply(response)
 
 
