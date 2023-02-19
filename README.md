@@ -27,7 +27,7 @@ Colab Notebooks of the process are also available.
 Used AIOgram to develop an asynchronous Telegram bot.
 
 ## Usage
-For now, the bot is private due to hosting limits.
+Available at @nerdless_bot in Telegram
 
 ## Creators
 Made by: https://github.com/RakePants (Artyom Eryomkin) & https://github.com/PixelPantz
