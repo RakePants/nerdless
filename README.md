@@ -1,5 +1,5 @@
 # Nerdless
-An AI chat bot for Telegram groups with 3 presets and an ability to participate in continious dialogues.
+An AI chat bot for Telegram groups with 3 presets and an ability to participate in continious dialogues in Russian.
 
 ## About
 The bot has 3 presets: toxic, sad, vulgar. These can be switched in a chat a by user with a help of commands anytime.
