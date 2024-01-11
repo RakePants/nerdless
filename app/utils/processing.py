@@ -42,11 +42,13 @@ async def remove_unwanted_characters(text) -> str:
     match = pattern.search(text)
     if match: text = text[:match.start()]
 
+    text = re.sub(r'[,;:]$', '', text)
+
     return text
 
 
-async def strip_text(text: str) -> str:
-    """Strip text from splitters and unwanted characters."""
+async def process_output(text: str) -> str:
+    """Strip output text from splitters and unwanted characters."""
     
     pad_token = tokenizer.convert_ids_to_tokens(0)  # <pad>
     token_first = tokenizer.convert_ids_to_tokens(50257)  # @@ПЕРВЫЙ@@
@@ -57,3 +59,27 @@ async def strip_text(text: str) -> str:
     clean_text = await remove_unwanted_characters(text)  # Remove unwanted characters from model answer
 
     return clean_text
+
+
+async def process_input(text: str, bot_username: str) -> str:
+    """Strip input of handlers and cut length."""
+    
+    limit = 300
+    text = text.replace(bot_username, '').strip()
+
+    if len(text) > limit:
+
+        if '\n' in text:
+            return text.split('\n')[0] 
+        
+        else:
+            last_space = text.rfind(' ', 0, limit)
+
+            if last_space == -1:
+                # No spaces found, cut to the limit
+                return text[:limit]
+            else:
+                # Cut to the last word before the limit
+                return text[:last_space]
+
+    return text

@@ -1,7 +1,9 @@
 import asyncio
+import logging
 from functools import partial
+
 from app.ai.lm import model_generate, tokenizer
-from app.ai.utils import strip_text
+from app.utils.processing import process_output
 
 
 async def answer(input):
@@ -12,8 +14,7 @@ async def answer(input):
     context_with_response = [tokenizer.decode(sample_token_ids) for sample_token_ids in generated_token_ids]
     
     generation = context_with_response[0]
-    print(generation)
+    output = await process_output(generation)
 
-    answer = await strip_text(generation)
-
-    return answer
+    logging.info(f"Generation: {output}")
+    return output
