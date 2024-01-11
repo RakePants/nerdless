@@ -1,10 +1,11 @@
 from aiogram import F, Router, types
+from aiogram.utils.chat_action import ChatActionSender
+
+from app.ai.pipeline import answer
 from app.bot.messages import *
 from app.bot.middlewares.answer import AnswerMiddleware
-from app.utils.history import update_history, get_history, represent_history
+from app.utils.history import get_history, represent_history, update_history
 from app.utils.processing import process_input
-from aiogram.utils.chat_action import ChatActionSender
-from app.ai.pipeline import answer
 
 router = Router()
 router.message.middleware(AnswerMiddleware())

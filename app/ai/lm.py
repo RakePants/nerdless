@@ -1,13 +1,8 @@
-import os
-from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-load_dotenv()
+from app.config import settings
 
-MODEL_MODE = os.getenv('MODEL_MODE')
-HF_MODEL_NAME = os.getenv('HF_MODEL_NAME')
-
-checkpoint = fr"app/ai/models/toxic_ruDialoGPT" if MODEL_MODE == 'local' else HF_MODEL_NAME
+checkpoint = fr"app/ai/models/toxic_ruDialoGPT" if settings.lm_mode == 'local' else settings.hf_model_name
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = AutoModelForCausalLM.from_pretrained(checkpoint)
 

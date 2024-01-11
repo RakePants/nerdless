@@ -1,3 +1,4 @@
+import logging
 import re
 
 from app.ai.lm import tokenizer
@@ -81,5 +82,7 @@ async def process_input(text: str, bot_username: str) -> str:
             else:
                 # Cut to the last word before the limit
                 return text[:last_space]
+
+    logging.info(f"Got input: {text}")
 
     return text
