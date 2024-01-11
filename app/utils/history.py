@@ -17,11 +17,14 @@ async def get_history(chat_id: int) -> list:
     return history
 
 
-async def update_history(chat_id: int, role: str, content: str = None) -> None:
+async def update_history(chat_id: int, role: str, content: str, mode: str = "append") -> None:
     """Add message to history"""
 
-    full_history = await get_history(chat_id)
-    history = full_history[:3]
+    if mode == "append":
+        full_history = await get_history(chat_id)
+        history = full_history[-3:]
+    else:
+        history = []
 
     async with get_db() as db:
 

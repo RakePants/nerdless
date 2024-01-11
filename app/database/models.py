@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import JSON, BigInteger, Column, Integer
+from sqlalchemy import JSON, BigInteger, Column, Float
 from sqlalchemy.sql.expression import text
 
 from app.database.database import Base, engine
@@ -11,7 +11,7 @@ class Chat(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=False)
     history = Column(JSON, server_default=text("'[]'"), nullable=False)
-    frequency = Column(Integer, server_default='30', nullable=False)
+    frequency = Column(Float, server_default='0.3', nullable=False)
 
 
 async def create_all() -> None:
