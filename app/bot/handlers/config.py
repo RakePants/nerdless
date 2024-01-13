@@ -91,7 +91,7 @@ async def frequency_command_handler(message: types.Message, command: CommandObje
 
 @router.message(lambda message: message.text.startswith('/'))
 async def any_command_handler(message: types.Message):
-    """Reset message history"""
+    """Print unknown command on any command"""
     
     text = Text(Italic(MSG_NO_COMMAND))
     await message.answer(**text.as_kwargs())
