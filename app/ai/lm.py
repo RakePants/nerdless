@@ -2,7 +2,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from app.config import settings
 
-checkpoint = fr"app/ai/models/toxic_ruDialoGPT" if settings.lm_mode == 'local' else settings.hf_model_name
+checkpoint = fr"app/ai/models/ruDialoGPT-medium-finetuned-toxic" if settings.lm_mode == 'local' else settings.hf_model_name
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = AutoModelForCausalLM.from_pretrained(checkpoint)
 
