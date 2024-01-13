@@ -40,9 +40,9 @@ To run this project:
    DATABASE_NAME=nerdless
    DATABASE_USERNAME=postgres
 
-   # Port that the Docker will use
+   # Port that the database container will use
    POSTGRES_CONTAINER_PORT=5454```
-3. If running the model locally, download the [model weights](https://huggingface.co/rakepants/ruDialoGPT-medium-finetuned-toxic) and put them into ./app/ai/model/{model_folder_name}
+3. If running the model locally, download the [model weights](https://huggingface.co/rakepants/ruDialoGPT-medium-finetuned-toxic) and put them into ./app/ai/model/ruDialoGPT-medium-finetuned-toxic
 4. Run `docker-compose up --build` in Terminal.
 ## Creators
 Made by [Artyom Eryomkin](https://github.com/RakePants) & [Mikhail Kuznecov](https://github.com/PixelPantz)
