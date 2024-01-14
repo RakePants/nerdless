@@ -11,4 +11,4 @@ RUN apt-get update && pip install --upgrade pip && pip install -r requirements.t
 
 COPY . .
 
-CMD python app/main.py
+CMD python -m app.main
