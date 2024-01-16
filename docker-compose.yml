@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   bot:
-    build: .
+    build: app
     environment:
       - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
       - MODE=${MODE}
@@ -13,7 +13,7 @@ services:
       - DATABASE_NAME=${DATABASE_NAME}
       - DATABASE_USERNAME=${DATABASE_USERNAME}
   db:
-    image: postgres:latest
+    image: postgres:16.1-bullseye
     volumes:
       - db_data:/var/lib/postgresql/data
     environment:

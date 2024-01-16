@@ -22,27 +22,27 @@ The model card is available at [HuggingFace 🤗](https://huggingface.co/rakepan
 ## Setup
 To run this project:
 1. Clone the repository
-2. Create a `.env` configuration and fill it in:
+2. Switch to the repository directory
+3. Create a `.env` configuration and fill it in:
    ```env
    # Telegram bot configuration
    TELEGRAM_TOKEN=
-   MODE=polling 
-   PORT=
+   MODE=polling
+   PORT=8443
 
-   MODEL_MODE=local  # Running the model locally or pulling from HF
+   MODEL_MODE=local  # Running the model locally, to pull from HF, put in anything else
    HF_MODEL_NAME=rakepants/ruDialoGPT-medium-finetuned-toxic
 
    # Database configuration
    DATABASE_HOSTNAME=db
-   DATABASE_PORT=5432
-   # Put a strong password here  
+   DATABASE_PORT=5432 
    DATABASE_PASSWORD=
    DATABASE_NAME=nerdless
    DATABASE_USERNAME=postgres
 
    # Port that the database container will use
    POSTGRES_CONTAINER_PORT=5454```
-3. If running the model locally, download the [model weights](https://huggingface.co/rakepants/ruDialoGPT-medium-finetuned-toxic) and put them into ./app/ai/model/ruDialoGPT-medium-finetuned-toxic
-4. Run `docker-compose up --build` in Terminal.
+4. If running the model locally instead of pulling from HuggingFace, download the [model weights](https://huggingface.co/rakepants/ruDialoGPT-medium-finetuned-toxic) and put them into ./app/ai/model/ruDialoGPT-medium-finetuned-toxic
+5. Run `docker-compose up --build`.
 ## Creators
 Made by [Artyom Eryomkin](https://github.com/RakePants) & [Mikhail Kuznecov](https://github.com/PixelPantz)
