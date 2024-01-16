@@ -41,7 +41,7 @@ To run this project:
    DATABASE_USERNAME=postgres
 
    # Port that the database container will use
-   POSTGRES_CONTAINER_PORT=5454```
+   DB_CONTAINER_PORT=5454```
 4. If running the model locally instead of pulling from HuggingFace, download the [model weights](https://huggingface.co/rakepants/ruDialoGPT-medium-finetuned-toxic) and put them into ./app/ai/model/ruDialoGPT-medium-finetuned-toxic
 5. Run `docker-compose up --build`.
 ## Creators

@@ -1,3 +1,15 @@
-venv/
-**/__pycache__/
 notebooks/
+README.md
+LICENSE
+
+# Environment
+venv/
+*.env
+
+# Cache
+**/__pycache__/
+
+# Git
+.git
+.gitignore
+.gitattributes
