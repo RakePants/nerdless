@@ -2,6 +2,7 @@ version: '3.9'
 services:
   app:
     build: app
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -17,7 +18,7 @@ services:
       - POSTGRES_USER=${DATABASE_USERNAME}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     ports:
-      - "${DB_CONTAINER_PORT}:${DATABASE_PORT}"
+      - "${DB_CONTAINER_PORT}:5432"
 
 volumes:
   db_data:

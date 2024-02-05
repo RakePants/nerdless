@@ -27,18 +27,17 @@ To run the Telegram bot application:
    ```env
    # Telegram bot configuration
    TELEGRAM_TOKEN=
-   MODE=polling
-   PORT=8443
+   MODE=polling  # 'webhook' for webhook mode
+   PORT=
 
-   MODEL_MODE=local  # Running the model locally, to pull from HF; put in anything else
-   HF_MODEL_NAME=rakepants/ruDialoGPT-medium-finetuned-toxic
+   MODEL_MODE=local  # Running the model locally; to pull from HF, put in anything else
+   HF_MODEL_NAME=rakepants/ruDialoGPT-medium-finetuned-toxic  # Used for pulling the model when running non-locally
 
    # Database configuration
    DATABASE_HOSTNAME=db
-   DATABASE_PORT=5432 
+   DATABASE_NAME=
+   DATABASE_USERNAME=
    DATABASE_PASSWORD=
-   DATABASE_NAME=nerdless
-   DATABASE_USERNAME=postgres
 
    # Port that the database container will use
    DB_CONTAINER_PORT=5454```
