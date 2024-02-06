@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher
 
 import app.bot.handlers.config as config
 import app.bot.handlers.echo as echo
-from app.config import settings
+from app.settings import settings
 
 
 async def start_bot():

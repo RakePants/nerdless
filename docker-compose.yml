@@ -1,27 +1,24 @@
-version: '3.8'
+version: '3.9'
 services:
-  bot:
-    build: .
-    environment:
-      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-      - MODE=${MODE}
-      - PORT=${PORT}
-      - HF_MODEL_NAME=${HF_MODEL_NAME}
-      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
-      - DATABASE_PORT=${DATABASE_PORT}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
-      - DATABASE_NAME=${DATABASE_NAME}
-      - DATABASE_USERNAME=${DATABASE_USERNAME}
+  app:
+    build: app
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
   db:
-    image: postgres:latest
+    image: postgres:16.1-bullseye
     volumes:
       - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
     environment:
       - POSTGRES_DB=${DATABASE_NAME}
       - POSTGRES_USER=${DATABASE_USERNAME}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     ports:
-      - "${POSTGRES_CONTAINER_PORT}:${DATABASE_PORT}"
+      - "${DB_CONTAINER_PORT}:5432"
 
 volumes:
   db_data:

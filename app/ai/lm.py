@@ -1,7 +1,7 @@
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from app.config import settings
+from app.settings import settings
 
 checkpoint = fr"app/ai/models/ruDialoGPT-medium-finetuned-toxic" if settings.lm_mode == 'local' else settings.hf_model_name
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)

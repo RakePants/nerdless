@@ -3,7 +3,7 @@ import logging
 
 from app.bot.bot import start_bot
 from app.database.models import create_all
-from app.config import settings
+from app.settings import settings
 
 
 # Start the Bot
